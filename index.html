@@ -1,0 +1,3491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ LLM Playground Pro — Next-Gen Model Testing & Prompt Studio</title>
+<style>
+/* ==================================================================
+   1. DESIGN SYSTEM & DESIGN TOKENS
+   Modern dark palette with sleek zinc tones, glowing emerald live states,
+   refined indigo/amber accents, and crisp typography.
+   ================================================================== */
+:root {
+  --bg-app: #09090b;
+  --bg-sidebar: #0f0f13;
+  --bg-card: #141419;
+  --bg-card-hover: #1a1a22;
+  --bg-input: #121217;
+  --bg-input-focus: #181820;
+  --bg-code: #0b0b0e;
+  
+  --border-subtle: #1e1e26;
+  --border-default: #272733;
+  --border-hover: #383849;
+  --border-focus: #6366f1;
+  
+  --text-main: #e4e4e7;
+  --text-strong: #fafafa;
+  --text-muted: #9ca3af;
+  --text-faint: #52525b;
+  
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-dim: rgba(99, 102, 241, 0.15);
+  --primary-glow: rgba(99, 102, 241, 0.35);
+  
+  --emerald: #10b981;
+  --emerald-dim: rgba(16, 185, 129, 0.15);
+  --amber: #f59e0b;
+  --amber-dim: rgba(245, 158, 11, 0.15);
+  --rose: #f43f5e;
+  --rose-dim: rgba(244, 63, 94, 0.15);
+  --cyan: #06b6d4;
+  --cyan-dim: rgba(6, 182, 212, 0.15);
+  
+  --mono-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --sans-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.7);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--sans-font);
+  font-size: 13.5px;
+  line-height: 1.5;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #272733; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3b3b4f; }
+
+/* ==================================================================
+   2. TOP BAR
+   ================================================================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 52px;
+  padding: 0 16px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-default);
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: max-content;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.brand-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: var(--primary-dim);
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Header Pickers & Controls */
+.topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 680px;
+  margin: 0 16px;
+}
+
+.picker-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 2px 4px;
+  gap: 4px;
+}
+
+.picker-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.topbar select {
+  background: var(--bg-input);
+  color: var(--text-strong);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.topbar select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-dim);
+}
+
+.model-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+#modelStatus {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  color: var(--text-strong);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-color: #6366f1;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+}
+
+.btn.primary:hover {
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.45);
+}
+
+.btn.stop {
+  background: var(--rose-dim);
+  border-color: var(--rose);
+  color: var(--rose);
+  font-weight: 600;
+}
+
+.btn.stop:hover {
+  background: rgba(244, 63, 94, 0.25);
+}
+
+.btn.icon-only {
+  padding: 6px;
+  width: 32px;
+  height: 32px;
+}
+
+.btn.active {
+  background: var(--primary-dim);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--emerald-dim);
+  color: var(--emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 6px var(--emerald);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ==================================================================
+   3. MAIN THREE-COLUMN WORKSPACE LAYOUT
+   ================================================================== */
+.workspace {
+  display: grid;
+  grid-template-columns: 310px 1fr 340px;
+  height: calc(100vh - 52px);
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  transition: grid-template-columns var(--transition-normal);
+}
+
+.workspace.hide-params {
+  grid-template-columns: 0px 1fr 340px;
+}
+
+.workspace.hide-insights {
+  grid-template-columns: 310px 1fr 0px;
+}
+
+.workspace.hide-both {
+  grid-template-columns: 0px 1fr 0px;
+}
+
+.column {
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.col-params {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-default);
+  padding: 16px;
+  gap: 16px;
+}
+
+.col-chat {
+  background: var(--bg-app);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  min-width: 0;
+}
+
+.col-insights {
+  background: var(--bg-sidebar);
+  border-left: 1px solid var(--border-default);
+  padding: 16px;
+  gap: 16px;
+}
+
+/* ==================================================================
+   4. FORM ELEMENTS & PARAMETERS SIDEBAR
+   ================================================================== */
+.param-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 14px;
+}
+
+.param-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-dim);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  padding-right: 32px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.password-toggle:hover {
+  color: var(--text-strong);
+}
+
+/* Sliders */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-container input[type="range"] {
+  flex: 1;
+  accent-color: var(--primary);
+  height: 4px;
+  background: var(--border-default);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.slider-container input[type="number"] {
+  width: 65px;
+  text-align: right;
+  font-family: var(--mono-font);
+  font-size: 12px;
+}
+
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.pill-btn {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--mono-font);
+}
+
+.pill-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Toggles & Switches */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.toggle-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-strong);
+  display: flex;
+  flex-direction: column;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border-default);
+  transition: .2s;
+  border-radius: 20px;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-muted);
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+  background-color: var(--primary);
+}
+
+input:checked + .switch-slider:before {
+  transform: translateX(16px);
+  background-color: #fff;
+}
+
+input:disabled + .switch-slider {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.param-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-family: var(--mono-font);
+}
+
+/* ==================================================================
+   5. CENTER CHAT COLUMN & COMPOSER
+   ================================================================== */
+.chat-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-mode-tabs {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.chat-mode-tab {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+}
+
+.chat-mode-tab.active {
+  background: var(--bg-card);
+  color: var(--text-strong);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.transcript-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  scroll-behavior: smooth;
+}
+
+/* Empty State Onboarding */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  max-width: 560px;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 18px;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--primary-dim);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.empty-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.quick-prompts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.quick-prompt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quick-prompt-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.quick-prompt-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: 4px;
+}
+
+.quick-prompt-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Chat Messages */
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.message-wrapper.user {
+  align-items: flex-end;
+}
+
+.message-wrapper.assistant {
+  align-items: flex-start;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+.role-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.role-badge.user {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+}
+
+.role-badge.assistant {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+}
+
+.message-bubble {
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  position: relative;
+  word-break: break-word;
+}
+
+.message-bubble.user {
+  background: linear-gradient(145deg, #1e1b4b, #2e1065);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #f1f5f9;
+  white-space: pre-wrap;
+  font-family: var(--mono-font);
+  font-size: 13px;
+  max-width: 85%;
+  box-shadow: 0 4px 12px rgba(30, 27, 75, 0.4);
+}
+
+.message-bubble.assistant {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  color: var(--text-main);
+  width: 100%;
+  box-shadow: var(--shadow-md);
+}
+
+/* Assistant Message Sub-elements */
+.request-details {
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.request-details summary {
+  padding: 6px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: var(--bg-sidebar);
+  user-select: none;
+}
+
+.request-details pre {
+  padding: 10px;
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: #cbd5e1;
+  background: var(--bg-code);
+  overflow-x: auto;
+  max-height: 240px;
+}
+
+/* Thinking / Reasoning Accordion */
+.thinking-box {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.thinking-box summary {
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber);
+  cursor: pointer;
+  background: rgba(245, 158, 11, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.thinking-box .thinking-content {
+  padding: 12px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #d1d5db;
+  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  white-space: pre-wrap;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.stream-spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(245, 158, 11, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--amber);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Sources & Citations */
+.sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.source-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 11.5px;
+  transition: border-color var(--transition-fast);
+}
+
+.source-item:hover {
+  border-color: var(--primary);
+}
+
+.source-title {
+  font-weight: 600;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.source-url {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Markdown Answer Formatting */
+.markdown-body {
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.markdown-body p { margin-bottom: 10px; }
+.markdown-body p:last-child { margin-bottom: 0; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  color: var(--text-strong);
+  margin: 16px 0 8px;
+  font-weight: 700;
+}
+.markdown-body ul, .markdown-body ol {
+  margin: 8px 0 12px 20px;
+}
+.markdown-body li { margin-bottom: 4px; }
+.markdown-body code {
+  font-family: var(--mono-font);
+  font-size: 12px;
+  background: var(--bg-code);
+  border: 1px solid var(--border-default);
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #38bdf8;
+}
+
+.code-block-wrapper {
+  position: relative;
+  margin: 12px 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-code);
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-default);
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--mono-font);
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-family: var(--mono-font);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #f8fafc;
+}
+
+.code-block-wrapper pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Math formula styling */
+.math-block {
+  padding: 10px 14px;
+  margin: 10px 0;
+  background: var(--bg-card-hover);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-family: "KaTeX_Main", "Times New Roman", serif;
+  font-size: 15px;
+  color: #e2e8f0;
+  overflow-x: auto;
+}
+
+/* Table styling */
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 12.5px;
+}
+
+.markdown-body th, .markdown-body td {
+  padding: 8px 12px;
+  border: 1px solid var(--border-default);
+  text-align: left;
+}
+
+.markdown-body th {
+  background: var(--bg-sidebar);
+  font-weight: 600;
+}
+
+/* Message Action Bar */
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.action-btn:hover {
+  background: var(--bg-sidebar);
+  border-color: var(--text-muted);
+  color: var(--text-strong);
+}
+
+.finish-badge {
+  font-size: 10.5px;
+  font-family: var(--mono-font);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+}
+
+.finish-badge.stop { background: var(--emerald-dim); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+.finish-badge.length { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+.finish-badge.abort { background: var(--rose-dim); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+/* Composer Bar */
+.composer-area {
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-sidebar);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.composer-input-wrapper {
+  position: relative;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.composer-input-wrapper:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-dim);
+}
+
+#promptInput {
+  width: 100%;
+  min-height: 110px;
+  max-height: 350px;
+  background: transparent;
+  border: none;
+  padding: 12px 14px;
+  font-family: var(--mono-font);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-strong);
+  resize: vertical;
+  outline: none;
+}
+
+.composer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.composer-hints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.char-counter {
+  font-family: var(--mono-font);
+  color: var(--text-faint);
+}
+
+.composer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ==================================================================
+   6. RIGHT INSIGHTS COLUMN: TELEMETRY & PROMPT STUDIO
+   ================================================================== */
+.insight-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.insight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.insight-header h3 {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* Prompt Analysis Box */
+.verdict-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-dim);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.verdict-tag {
+  font-size: 13px;
+  font-weight: 800;
+  color: #a5b4fc;
+  letter-spacing: 0.04em;
+}
+
+.technique-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tech-chip {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-default);
+  color: #cbd5e1;
+}
+
+.tech-chip.active {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.analysis-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11.5px;
+}
+
+.analysis-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--text-main);
+}
+
+.analysis-item.off {
+  color: var(--text-faint);
+}
+
+.analysis-item q {
+  color: var(--amber);
+  font-family: var(--mono-font);
+}
+
+/* Speed / Latency Meter */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  text-align: center;
+}
+
+.metric-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 4px;
+}
+
+.metric-val {
+  font-family: var(--mono-font);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.metric-lbl {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Token & Cost Table */
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.token-table td {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.token-table td.num {
+  text-align: right;
+  font-family: var(--mono-font);
+  font-weight: 500;
+}
+
+.cost-pill {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-weight: 600;
+}
+
+/* ==================================================================
+   7. ARENA (SIDE-BY-SIDE) MODE
+   ================================================================== */
+.arena-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  height: 100%;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.arena-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.arena-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.arena-transcript {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ==================================================================
+   8. MODALS & DIALOGS (HTML5 <dialog>)
+   ================================================================== */
+dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-main);
+  padding: 0;
+  max-width: 840px;
+  width: 90vw;
+  max-height: 85vh;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+  outline: none;
+  z-index: 100;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.modal-header h2 {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.modal-body {
+  padding: 18px;
+  overflow-y: auto;
+  max-height: calc(85vh - 60px);
+}
+
+.code-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-default);
+  padding-bottom: 8px;
+}
+
+.code-tab-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.code-tab-btn.active {
+  background: var(--primary-dim);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.modal-pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #e2e8f0;
+  overflow: auto;
+  max-height: 360px;
+  white-space: pre;
+}
+
+/* ==================================================================
+   9. RESPONSIVE MEDIA QUERIES
+   ================================================================== */
+@media (max-width: 1200px) {
+  .workspace {
+    grid-template-columns: 280px 1fr 280px;
+  }
+}
+
+@media (max-width: 980px) {
+  body { overflow: auto; }
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+  }
+  .col-params, .col-insights {
+    border: none;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .transcript-container {
+    min-height: 400px;
+    max-height: 70vh;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP HEADER ===================== -->
+<header class="topbar">
+  <div class="brand-section">
+    <div class="brand-logo">⚡</div>
+    <div class="brand-title">
+      LLM Playground Pro
+      <span class="brand-tag">v2.5</span>
+    </div>
+  </div>
+
+  <div class="topbar-center">
+    <!-- Provider Picker -->
+    <div class="picker-group">
+      <label for="providerSelect">Provider</label>
+      <select id="providerSelect" aria-label="LLM Provider">
+        <option value="groq" selected>Groq (Ultra-Fast)</option>
+        <option value="openai">OpenAI (Official)</option>
+        <option value="openrouter">OpenRouter (Multi-Model)</option>
+        <option value="deepseek">DeepSeek (V3 & R1)</option>
+        <option value="ollama">Ollama (Local / Offline)</option>
+        <option value="custom">Custom Endpoint</option>
+      </select>
+    </div>
+
+    <!-- Model Picker -->
+    <div class="model-select-wrapper">
+      <div class="picker-group">
+        <label for="modelSelect">Model</label>
+        <select id="modelSelect" aria-label="Model Selection"></select>
+      </div>
+      <span id="modelStatus">Initializing models...</span>
+    </div>
+  </div>
+
+  <div class="topbar-actions">
+    <!-- Arena / Compare Toggle -->
+    <button id="arenaToggleBtn" class="btn" title="Toggle Side-by-Side Model Comparison Arena">
+      <span>⚔️</span> Arena Mode
+    </button>
+
+    <!-- Prompt Library Modal Button -->
+    <button id="libraryBtn" class="btn" title="Open Curated Prompt Templates">
+      <span>📚</span> Templates
+    </button>
+
+    <!-- View Code Modal Button -->
+    <button id="viewCodeBtn" class="btn" title="Export this request as cURL, Python, TypeScript, etc.">
+      <span>💻</span> View Code
+    </button>
+
+    <!-- Live Status Pill -->
+    <div class="status-badge" id="livePill" title="Connected to API endpoint directly from your browser">
+      <div class="pulse-dot"></div>
+      <span id="liveStatusText">LIVE API</span>
+    </div>
+
+    <!-- Layout Collapse Toggles -->
+    <button id="toggleParamsBtn" class="btn icon-only" title="Toggle Parameters Sidebar">⚙️</button>
+    <button id="toggleInsightsBtn" class="btn icon-only" title="Toggle Insights Sidebar">📊</button>
+  </div>
+</header>
+
+<!-- ===================== THREE-COLUMN WORKSPACE ===================== -->
+<main class="workspace" id="mainWorkspace">
+
+  <!-- ===================== LEFT: PARAMETERS & PROMPT CONTROLS ===================== -->
+  <aside class="column col-params" id="colParams">
+
+    <!-- Endpoint & Authentication Section -->
+    <div class="param-section">
+      <div class="section-title">
+        <span>Connection & Keys</span>
+        <button id="clearKeyBtn" class="pill-btn" style="padding:1px 6px;">Clear</button>
+      </div>
+
+      <div id="customEndpointBox" hidden>
+        <div class="field-label">Custom Base URL</div>
+        <input id="customBaseUrl" type="text" placeholder="https://api.your-host.com/v1">
+      </div>
+
+      <div class="field-label">
+        <span id="keyLabel">API Key</span>
+        <span class="param-badge" id="keySecureBadge">Browser Only</span>
+      </div>
+      <div class="password-wrapper">
+        <input id="apiKeyInput" type="password" placeholder="Paste your API key here..." autocomplete="off" spellcheck="false">
+        <button id="toggleKeyVisBtn" class="password-toggle" type="button" title="Show/Hide Key">👁️</button>
+      </div>
+      
+      <div class="toggle-row" style="margin-top: 4px;">
+        <span class="field-hint">Remember key in this tab session</span>
+        <label class="switch">
+          <input id="rememberKeyCheck" type="checkbox" checked>
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+      <p class="field-hint" style="color:var(--text-faint);">Your API key stays entirely inside your browser and is only sent directly to the selected provider endpoint.</p>
+    </div>
+
+    <!-- System Prompt Section -->
+    <div class="param-section">
+      <div class="section-title">
+        <span>System Instructions</span>
+        <select id="systemPresetSelect" style="width: auto; padding: 2px 6px; font-size: 11px;">
+          <option value="default">Helpful Assistant</option>
+          <option value="coder">Expert Software Engineer</option>
+          <option value="json">Strict JSON Extraction</option>
+          <option value="socratic">Socratic Tutor</option>
+          <option value="concise">Ultra-Concise No Fluff</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <textarea id="systemPromptInput" rows="3" placeholder="Enter system instructions for the model..." spellcheck="false"></textarea>
+    </div>
+
+    <!-- Core Sampling Sliders -->
+    <div class="param-section">
+      <div class="section-title">Sampling Parameters</div>
+
+      <!-- Temperature -->
+      <div class="field-label">
+        <span>Temperature</span>
+        <span class="field-hint" id="tempValueLabel">0.70</span>
+      </div>
+      <div class="slider-container">
+        <input id="tempRange" type="range" min="0" max="2" step="0.05" value="0.7">
+        <input id="tempBox" type="number" min="0" max="2" step="0.05" value="0.7">
+      </div>
+
+      <!-- Top-P -->
+      <div class="field-label" style="margin-top: 8px;">
+        <span>Top P (Nucleus)</span>
+        <span class="field-hint" id="topPValueLabel">1.00</span>
+      </div>
+      <div class="slider-container">
+        <input id="topPRange" type="range" min="0" max="1" step="0.05" value="1.0">
+        <input id="topPBox" type="number" min="0" max="1" step="0.05" value="1.0">
+      </div>
+
+      <!-- Max Completion Tokens -->
+      <div class="field-label" style="margin-top: 8px;">
+        <span>Max Output Tokens</span>
+        <span class="field-hint" id="maxTokensLabel">1024</span>
+      </div>
+      <div class="slider-container">
+        <input id="maxTokensRange" type="range" min="64" max="8192" step="64" value="1024">
+        <input id="maxTokensBox" type="number" min="16" max="32768" step="16" value="1024">
+      </div>
+      <div class="pill-group">
+        <button class="pill-btn" onclick="setMaxTokens(256)">256</button>
+        <button class="pill-btn" onclick="setMaxTokens(512)">512</button>
+        <button class="pill-btn" onclick="setMaxTokens(1024)">1k</button>
+        <button class="pill-btn" onclick="setMaxTokens(2048)">2k</button>
+        <button class="pill-btn" onclick="setMaxTokens(4096)">4k</button>
+      </div>
+    </div>
+
+    <!-- Reasoning & Special Features -->
+    <div class="param-section">
+      <div class="section-title">Model Capabilities</div>
+
+      <!-- Web Search Toggle -->
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <span>Web Search Grounding</span>
+          <span class="field-hint" id="webSearchSupportNote">Supported on search models</span>
+        </div>
+        <label class="switch">
+          <input id="webSearchToggle" type="checkbox">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
+      <!-- Reasoning / Thinking Mode -->
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <span>Extended Reasoning</span>
+          <span class="field-hint" id="reasoningSupportNote">Thinking tokens / parsed</span>
+        </div>
+        <label class="switch">
+          <input id="reasoningToggle" type="checkbox">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
+      <!-- Reasoning Effort Selector (When enabled) -->
+      <div id="reasoningEffortWrapper" style="margin-top: 6px;">
+        <div class="field-label">Reasoning Effort</div>
+        <select id="reasoningEffortSelect">
+          <option value="low">Low (Faster, concise)</option>
+          <option value="medium" selected>Medium (Balanced)</option>
+          <option value="high">High (Deep reasoning)</option>
+        </select>
+      </div>
+
+      <!-- Stream Responses Toggle -->
+      <div class="toggle-row" style="margin-top: 6px;">
+        <div class="toggle-label">
+          <span>Stream Responses (SSE)</span>
+          <span class="field-hint">Token-by-token live streaming</span>
+        </div>
+        <label class="switch">
+          <input id="streamToggle" type="checkbox" checked>
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Advanced Fine-Tuning (Accordion) -->
+    <details class="param-section" style="cursor: pointer;">
+      <summary class="section-title"><span>Advanced Hyperparameters</span></summary>
+      
+      <div style="margin-top: 10px;">
+        <div class="field-label">Stop Sequences</div>
+        <input id="stopSeqInput" type="text" placeholder="e.g. ###, Output:, END">
+        <p class="field-hint">Comma separated, up to 4 strings.</p>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <div class="field-label">Frequency Penalty (-2.0 to 2.0)</div>
+        <div class="slider-container">
+          <input id="freqPenRange" type="range" min="-2" max="2" step="0.1" value="0">
+          <input id="freqPenBox" type="number" min="-2" max="2" step="0.1" value="0">
+        </div>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <div class="field-label">Presence Penalty (-2.0 to 2.0)</div>
+        <div class="slider-container">
+          <input id="presPenRange" type="range" min="-2" max="2" step="0.1" value="0">
+          <input id="presPenBox" type="number" min="-2" max="2" step="0.1" value="0">
+        </div>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <div class="field-label">Response Format</div>
+        <select id="responseFormatSelect">
+          <option value="text">Standard Text</option>
+          <option value="json_object">Strict JSON Object</option>
+        </select>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <div class="field-label">Seed (Reproducibility)</div>
+        <input id="seedInput" type="number" placeholder="Optional integer (e.g. 42)">
+      </div>
+    </details>
+
+    <!-- Reset / Clear Buttons -->
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
+      <button id="resetChatBtn" class="btn" style="width: 100%;">🧹 Reset Conversation</button>
+      <div style="display: flex; gap: 8px;">
+        <button id="exportChatBtn" class="btn" style="flex:1; font-size:11px;">Export</button>
+        <button id="importChatBtn" class="btn" style="flex:1; font-size:11px;">Import</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== CENTER: CHAT / ARENA WORKSPACE ===================== -->
+  <section class="column col-chat" id="colChat">
+
+    <!-- Top Chat Context Strip -->
+    <div class="chat-header-bar">
+      <div class="chat-header-left">
+        <span id="chatTurnsCount">0 messages in context</span>
+        <span style="color:var(--border-hover)">|</span>
+        <span id="contextTokenEst">Estimated context: ~0 tokens</span>
+      </div>
+      <div>
+        <button id="clearTranscriptOnlyBtn" class="action-btn" title="Clear chat bubbles while keeping parameters">Clear view</button>
+      </div>
+    </div>
+
+    <!-- Chat Transcript (Single Mode) -->
+    <div class="transcript-container" id="transcript">
+      <!-- Empty State Starter -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🚀</div>
+        <h2 class="empty-title">Next-Gen LLM Playground</h2>
+        <p class="empty-subtitle">
+          Connect directly from your browser to Groq, OpenAI, OpenRouter, DeepSeek, or local Ollama.
+          Experiment with prompt techniques, inspect live token streaming rates, and benchmark performance.
+        </p>
+
+        <div class="quick-prompts-grid">
+          <div class="quick-prompt-card" onclick="loadTemplate('sentiment')">
+            <div class="quick-prompt-title">🏷️ Few-Shot Sentiment</div>
+            <div class="quick-prompt-desc">Classify user reviews using worked few-shot examples.</div>
+          </div>
+          <div class="quick-prompt-card" onclick="loadTemplate('json_extractor')">
+            <div class="quick-prompt-title">📦 JSON Schema Extractor</div>
+            <div class="quick-prompt-desc">Extract structured entities from unstructured customer emails.</div>
+          </div>
+          <div class="quick-prompt-card" onclick="loadTemplate('reasoning_puzzle')">
+            <div class="quick-prompt-title">🧠 Chain-of-Thought Logic</div>
+            <div class="quick-prompt-desc">Test reasoning models with multi-step logic & math puzzles.</div>
+          </div>
+          <div class="quick-prompt-card" onclick="loadTemplate('code_refactor')">
+            <div class="quick-prompt-title">⚡ High-Performance Refactor</div>
+            <div class="quick-prompt-desc">Optimize algorithms and generate typed, commented code.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arena Container (Split Mode - hidden by default) -->
+    <div class="arena-container" id="arenaContainer" hidden>
+      <!-- Model A Pane -->
+      <div class="arena-pane" id="arenaPaneA">
+        <div class="arena-pane-header">
+          <span style="font-weight:700; color:#818cf8;">Model A</span>
+          <select id="arenaModelASelect" style="width: 220px; font-size:11.5px;"></select>
+        </div>
+        <div class="arena-transcript" id="arenaTranscriptA"></div>
+      </div>
+      <!-- Model B Pane -->
+      <div class="arena-pane" id="arenaPaneB">
+        <div class="arena-pane-header">
+          <span style="font-weight:700; color:#34d399;">Model B</span>
+          <select id="arenaModelBSelect" style="width: 220px; font-size:11.5px;"></select>
+        </div>
+        <div class="arena-transcript" id="arenaTranscriptB"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Composer Area -->
+    <div class="composer-area">
+      <div class="composer-input-wrapper">
+        <textarea id="promptInput" placeholder="Enter your prompt here... (Cmd+Enter or Ctrl+Enter to submit)" spellcheck="false"></textarea>
+      </div>
+      
+      <div class="composer-toolbar">
+        <div class="composer-hints">
+          <span class="char-counter" id="charCounter">0 chars · ~0 tokens</span>
+          <span style="color:var(--border-default)">•</span>
+          <span><kbd style="background:var(--bg-card); padding:1px 5px; border-radius:3px; border:1px solid var(--border-default);">⌘</kbd> + <kbd style="background:var(--bg-card); padding:1px 5px; border-radius:3px; border:1px solid var(--border-default);">Enter</kbd> to run</span>
+          <span><kbd style="background:var(--bg-card); padding:1px 5px; border-radius:3px; border:1px solid var(--border-default);">Esc</kbd> to stop</span>
+        </div>
+
+        <div class="composer-buttons">
+          <button id="clearPromptTextBtn" class="btn" style="padding: 6px 10px; font-size: 11.5px;">Clear</button>
+          <button id="sendBtn" class="btn primary">
+            <span id="sendBtnIcon">▶</span>
+            <span id="sendBtnText">Submit</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RIGHT: PROMPT STUDIO & TELEMETRY ===================== -->
+  <aside class="column col-insights" id="colInsights">
+
+    <!-- Card 1: Prompt Engineering Analysis -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <h3>Prompt Analysis</h3>
+        <span class="param-badge" id="analysisLiveBadge">Live Inspection</span>
+      </div>
+
+      <div class="verdict-banner">
+        <div>
+          <div style="font-size:10px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Prompt Classification</div>
+          <div class="verdict-tag" id="verdictTag">ZERO-SHOT</div>
+        </div>
+        <div id="exampleCountPill" class="param-badge" style="background:rgba(99,102,241,0.2); color:#a5b4fc; border-color:rgba(99,102,241,0.4);">
+          0 Examples
+        </div>
+      </div>
+
+      <!-- Detected Techniques -->
+      <div style="font-size:11px; font-weight:600; color:var(--text-muted); margin-top:2px;">Detected Prompt Patterns</div>
+      <div class="technique-chips" id="techniqueChips"></div>
+
+      <!-- Heuristic Checklist -->
+      <ul class="analysis-list" id="analysisWhyList"></ul>
+    </div>
+
+    <!-- Card 2: Speed & Generation Telemetry -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <h3>Speed & Latency</h3>
+        <span class="field-hint" id="speedStatus">Last Reply</span>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-val" id="metricTtft">–</div>
+          <div class="metric-lbl">ms to 1st token</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="metricTotalTime">–</div>
+          <div class="metric-lbl">seconds total</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="metricTps" style="color:var(--emerald);">–</div>
+          <div class="metric-lbl">tokens / sec</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Token Usage & Cost Estimator -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <h3>Token Usage & Cost</h3>
+        <span class="cost-pill" id="estimatedCostBadge">~$0.0000</span>
+      </div>
+
+      <table class="token-table">
+        <tbody>
+          <tr>
+            <td>Input (Prompt) Tokens</td>
+            <td class="num" id="usageInputTokens">–</td>
+          </tr>
+          <tr>
+            <td>Reasoning (Thinking) Tokens</td>
+            <td class="num" id="usageReasoningTokens">–</td>
+          </tr>
+          <tr>
+            <td>Output (Completion) Tokens</td>
+            <td class="num" id="usageOutputTokens">–</td>
+          </tr>
+          <tr style="border-top: 1px solid var(--border-default); font-weight:600;">
+            <td style="color:var(--text-strong);">Total Tokens</td>
+            <td class="num" id="usageTotalTokens" style="color:var(--text-strong);">–</td>
+          </tr>
+          <tr>
+            <td>Tokens Remaining in Quota</td>
+            <td class="num" id="usageRateLimitLeft">–</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="field-hint" id="rateLimitResetHint" style="font-size:10.5px; color:var(--text-muted);">
+        Rate limit quotas update dynamically from response headers.
+      </div>
+    </div>
+
+    <!-- Card 4: Run History -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <h3>Recent Turns</h3>
+        <button id="clearHistoryBtn" class="pill-btn" style="padding:1px 6px;">Clear</button>
+      </div>
+      <div id="runHistoryList" style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; font-size:11.5px;">
+        <span style="color:var(--text-faint); font-style:italic;">No turns recorded in this session.</span>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ===================== MODAL: VIEW CODE ===================== -->
+<dialog id="codeDialog">
+  <div class="modal-header">
+    <h2>This Request as Code</h2>
+    <button class="action-btn" onclick="document.getElementById('codeDialog').close()">✕</button>
+  </div>
+  <div class="modal-body">
+    <p class="field-hint" style="margin-bottom: 12px;">
+      Export the exact parameters, system prompt, temperature, and conversation history into production-ready code snippets.
+    </p>
+    <div class="code-tabs">
+      <button class="code-tab-btn active" onclick="switchCodeTab('curl', this)">cURL</button>
+      <button class="code-tab-btn" onclick="switchCodeTab('python', this)">Python (OpenAI SDK)</button>
+      <button class="code-tab-btn" onclick="switchCodeTab('js', this)">JavaScript / TypeScript (Fetch)</button>
+      <button class="code-tab-btn" onclick="switchCodeTab('node', this)">Node.js (OpenAI SDK)</button>
+    </div>
+    <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+      <button id="copyCodeBtn" class="btn" style="padding:3px 10px; font-size:11.5px;">📋 Copy Code</button>
+    </div>
+    <pre class="modal-pre" id="codeDisplayArea"></pre>
+  </div>
+</dialog>
+
+<!-- ===================== MODAL: PROMPT TEMPLATES ===================== -->
+<dialog id="libraryDialog">
+  <div class="modal-header">
+    <h2>Curated Prompt Templates</h2>
+    <button class="action-btn" onclick="document.getElementById('libraryDialog').close()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="quick-prompts-grid" style="grid-template-columns: 1fr;">
+      <div class="quick-prompt-card" onclick="loadTemplate('sentiment'); document.getElementById('libraryDialog').close();">
+        <div class="quick-prompt-title">🏷️ Few-Shot Sentiment Classification</div>
+        <div class="quick-prompt-desc">Demonstrates canonical few-shot in-context learning with Input/Output exemplars.</div>
+      </div>
+      <div class="quick-prompt-card" onclick="loadTemplate('json_extractor'); document.getElementById('libraryDialog').close();">
+        <div class="quick-prompt-title">📦 JSON Schema Information Extraction</div>
+        <div class="quick-prompt-desc">Prompts the model to return typed JSON compliant with explicit schema keys.</div>
+      </div>
+      <div class="quick-prompt-card" onclick="loadTemplate('reasoning_puzzle'); document.getElementById('libraryDialog').close();">
+        <div class="quick-prompt-title">🧠 Chain-of-Thought Multi-Step Logic</div>
+        <div class="quick-prompt-desc">A complex logic deduction problem designed to test extended reasoning and step-by-step thinking.</div>
+      </div>
+      <div class="quick-prompt-card" onclick="loadTemplate('code_refactor'); document.getElementById('libraryDialog').close();">
+        <div class="quick-prompt-title">⚡ High-Performance Code Refactoring</div>
+        <div class="quick-prompt-desc">Directs the model to profile time complexity, identify bottlenecks, and produce clean code.</div>
+      </div>
+      <div class="quick-prompt-card" onclick="loadTemplate('creative_story'); document.getElementById('libraryDialog').close();">
+        <div class="quick-prompt-title">✍️ Creative Copywriting & Narrative Hook</div>
+        <div class="quick-prompt-desc">Generates compelling product launch narratives and marketing headlines with stylistic constraints.</div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===================== MODAL: IMPORT / EXPORT ===================== -->
+<dialog id="ioDialog">
+  <div class="modal-header">
+    <h2 id="ioDialogTitle">Conversation I/O</h2>
+    <button class="action-btn" onclick="document.getElementById('ioDialog').close()">✕</button>
+  </div>
+  <div class="modal-body">
+    <textarea id="ioTextArea" rows="12" style="font-family:var(--mono-font); font-size:12px;"></textarea>
+    <div style="display:flex; justify-content:space-between; margin-top:12px;">
+      <button id="ioCopyOrLoadBtn" class="btn primary">Apply</button>
+      <button class="btn" onclick="document.getElementById('ioDialog').close()">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ===================== JAVASCRIPT APPLICATION CORE ===================== -->
+<script>
+"use strict";
+
+/* ==================================================================
+   1. PROVIDERS & CAPABILITY REGISTRY
+   ================================================================== */
+const PROVIDER_CONFIGS = {
+  groq: {
+    name: "Groq",
+    baseUrl: "https://api.groq.com/openai/v1",
+    keyStorageName: "groq_api_key",
+    keyPlaceholder: "gsk_...",
+    supportsSearch: true,
+    supportsReasoning: true,
+    pricing: { inputPerM: 0.05, outputPerM: 0.08 },
+    fallbackModels: [
+      "llama-3.3-70b-versatile",
+      "llama-3.1-8b-instant",
+      "openai/gpt-oss-120b",
+      "openai/gpt-oss-20b",
+      "qwen/qwen3.8-27b",
+      "deepseek-r1-distill-llama-70b"
+    ],
+    defaultModel: "llama-3.3-70b-versatile"
+  },
+  openai: {
+    name: "OpenAI",
+    baseUrl: "https://api.openai.com/v1",
+    keyStorageName: "openai_api_key",
+    keyPlaceholder: "sk-proj-...",
+    supportsSearch: false,
+    supportsReasoning: true,
+    pricing: { inputPerM: 2.50, outputPerM: 10.00 },
+    fallbackModels: [
+      "gpt-4o",
+      "gpt-4o-mini",
+      "o1",
+      "o3-mini",
+      "gpt-4-turbo"
+    ],
+    defaultModel: "gpt-4o-mini"
+  },
+  openrouter: {
+    name: "OpenRouter",
+    baseUrl: "https://openrouter.ai/api/v1",
+    keyStorageName: "openrouter_api_key",
+    keyPlaceholder: "sk-or-v1-...",
+    supportsSearch: true,
+    supportsReasoning: true,
+    pricing: { inputPerM: 1.00, outputPerM: 3.00 },
+    fallbackModels: [
+      "anthropic/claude-3.5-sonnet",
+      "deepseek/deepseek-r1",
+      "google/gemini-2.0-flash-001",
+      "meta-llama/llama-3.3-70b-instruct"
+    ],
+    defaultModel: "anthropic/claude-3.5-sonnet"
+  },
+  deepseek: {
+    name: "DeepSeek",
+    baseUrl: "https://api.deepseek.com",
+    keyStorageName: "deepseek_api_key",
+    keyPlaceholder: "sk-...",
+    supportsSearch: false,
+    supportsReasoning: true,
+    pricing: { inputPerM: 0.14, outputPerM: 0.28 },
+    fallbackModels: [
+      "deepseek-chat",
+      "deepseek-reasoner"
+    ],
+    defaultModel: "deepseek-chat"
+  },
+  ollama: {
+    name: "Ollama (Local)",
+    baseUrl: "http://localhost:11434/v1",
+    keyStorageName: "ollama_key",
+    keyPlaceholder: "No API key required for local Ollama",
+    supportsSearch: false,
+    supportsReasoning: false,
+    pricing: { inputPerM: 0.00, outputPerM: 0.00 },
+    fallbackModels: [
+      "llama3.2:latest",
+      "llama3.1:8b",
+      "mistral:latest",
+      "deepseek-r1:latest",
+      "qwen2.5-coder:latest"
+    ],
+    defaultModel: "llama3.2:latest"
+  },
+  custom: {
+    name: "Custom Endpoint",
+    baseUrl: "http://localhost:8000/v1",
+    keyStorageName: "custom_endpoint_key",
+    keyPlaceholder: "Enter optional Bearer token...",
+    supportsSearch: false,
+    supportsReasoning: false,
+    pricing: { inputPerM: 0.00, outputPerM: 0.00 },
+    fallbackModels: ["default-model"],
+    defaultModel: "default-model"
+  }
+};
+
+/* ==================================================================
+   2. APPLICATION STATE
+   ================================================================== */
+let currentProvider = "groq";
+let activeModels = [];
+let conversation = []; // [{role, content}]
+let isStreaming = false;
+let abortController = null;
+let currentCodeTab = "curl";
+let isArenaMode = false;
+let lastSentPrompt = "";
+let recentRuns = [];
+
+const $ = id => document.getElementById(id);
+
+/* ==================================================================
+   3. CURATED PROMPT TEMPLATES & SYSTEM PRESETS
+   ================================================================== */
+const PROMPT_TEMPLATES = {
+  sentiment: [
+    "Classify the sentiment of each review as positive, neutral, or negative.",
+    "",
+    "Input: The battery lasts all day, genuinely love it.",
+    "Output: positive",
+    "",
+    "Input: Screen cracked after one week of gentle use.",
+    "Output: negative",
+    "",
+    "Input: Shipping arrived on time. Packaging was cardboard.",
+    "Output: neutral",
+    "",
+    "Input: The camera is surprisingly decent for this price range.",
+    "Output:"
+  ].join("\n"),
+
+  json_extractor: [
+    "Extract customer details into strict JSON with keys: name, issue, priority (low/medium/high), and refund_requested (boolean).",
+    "",
+    "Input email:",
+    "Hi support, my name is Sarah Jenkins. Order #94821 arrived with a broken handle yesterday. I need a replacement or full refund immediately as this is a gift for tomorrow!",
+    "",
+    "JSON Output:"
+  ].join("\n"),
+
+  reasoning_puzzle: [
+    "Solve this logic problem step-by-step before stating the final answer:",
+    "",
+    "Four runners—Alex, Brooke, Charlie, and Dana—finished a sprint.",
+    "1. Brooke was not first and was not last.",
+    "2. Alex finished ahead of Charlie.",
+    "3. Charlie finished immediately behind Brooke.",
+    "",
+    "What was the exact finishing order from 1st to 4th place? Explain your reasoning step-by-step."
+  ].join("\n"),
+
+  code_refactor: [
+    "Analyze the following Python function for time and space complexity, identify bottlenecks, and provide an optimized, typed version with unit tests:",
+    "",
+    "```python",
+    "def find_duplicates(arr):",
+    "    duplicates = []",
+    "    for i in range(len(arr)):",
+    "        for j in range(i + 1, len(arr)):",
+    "            if arr[i] == arr[j] and arr[i] not in duplicates:",
+    "                duplicates.append(arr[i])",
+    "    return duplicates",
+    "```"
+  ].join("\n"),
+
+  creative_story: [
+    "Write a punchy, atmospheric 3-paragraph product story for an anti-gravity coffee mug that keeps drinks suspended mid-air.",
+    "Constraints:",
+    "- Tone: Cyberpunk minimalist",
+    "- Mention at least one technical-sounding quantum mechanism",
+    "- Conclude with a memorable one-liner slogan."
+  ].join("\n")
+};
+
+const SYSTEM_PRESETS = {
+  default: "You are a helpful, expert AI assistant. Provide direct, truthful, and well-structured answers.",
+  coder: "You are a Principal Software Architect. Write clean, production-grade, thoroughly typed code. Explain trade-offs concisely.",
+  json: "You are a structured data extraction engine. Always output pure, valid JSON with no markdown backticks, conversational preamble, or postscript.",
+  socratic: "You are a Socratic tutor. Guide the user through questions, analogies, and first-principles thinking rather than simply handing over the final answers.",
+  concise: "You are a hyper-concise advisor. Deliver accurate answers in the fewest words possible. Omit pleasantries, filler phrases, and boilerplate warnings."
+};
+
+/* ==================================================================
+   4. INITIALIZATION & STORAGE HELPERS
+   ================================================================== */
+function initApp() {
+  restoreProvider();
+  setupEventListeners();
+  loadSavedKey();
+  loadModelsForProvider();
+  $("promptInput").value = PROMPT_TEMPLATES.sentiment;
+  analyzeCurrentPrompt();
+  updateCharCount();
+  updateContextStats();
+}
+
+function restoreProvider() {
+  const saved = localStorage.getItem("llm_playground_provider");
+  if (saved && PROVIDER_CONFIGS[saved]) {
+    currentProvider = saved;
+    $("providerSelect").value = saved;
+  }
+  updateProviderUI();
+}
+
+function updateProviderUI() {
+  const cfg = PROVIDER_CONFIGS[currentProvider];
+  $("keyLabel").textContent = cfg.name + " API Key";
+  $("apiKeyInput").placeholder = cfg.keyPlaceholder;
+  
+  if (currentProvider === "custom") {
+    $("customEndpointBox").hidden = false;
+    $("customBaseUrl").value = localStorage.getItem("custom_base_url") || cfg.baseUrl;
+  } else {
+    $("customEndpointBox").hidden = true;
+  }
+
+  // Capability adjustments
+  $("webSearchToggle").disabled = !cfg.supportsSearch;
+  $("webSearchSupportNote").textContent = cfg.supportsSearch ? "Available on supported models" : "Not supported on this provider";
+  if (!cfg.supportsSearch) $("webSearchToggle").checked = false;
+
+  loadSavedKey();
+}
+
+function getEffectiveBaseUrl() {
+  if (currentProvider === "custom") {
+    return $("customBaseUrl").value.trim() || PROVIDER_CONFIGS.custom.baseUrl;
+  }
+  return PROVIDER_CONFIGS[currentProvider].baseUrl;
+}
+
+function loadSavedKey() {
+  const cfg = PROVIDER_CONFIGS[currentProvider];
+  const saved = sessionStorage.getItem(cfg.keyStorageName) || localStorage.getItem(cfg.keyStorageName) || "";
+  $("apiKeyInput").value = saved;
+}
+
+function saveKey() {
+  const cfg = PROVIDER_CONFIGS[currentProvider];
+  const key = $("apiKeyInput").value.trim();
+  if ($("rememberKeyCheck").checked && key) {
+    sessionStorage.setItem(cfg.keyStorageName, key);
+  } else {
+    sessionStorage.removeItem(cfg.keyStorageName);
+    localStorage.removeItem(cfg.keyStorageName);
+  }
+}
+
+function getKey() {
+  return $("apiKeyInput").value.trim();
+}
+
+/* ==================================================================
+   5. MODEL MANAGEMENT & LIVE DISCOVERY
+   ================================================================== */
+async function loadModelsForProvider() {
+  const cfg = PROVIDER_CONFIGS[currentProvider];
+  const baseUrl = getEffectiveBaseUrl();
+  const key = getKey();
+
+  $("modelStatus").textContent = "Loading available models...";
+  
+  // Try live fetch if key is present or provider doesn't require key
+  if (key || currentProvider === "ollama") {
+    try {
+      const headers = {};
+      if (key) headers["Authorization"] = "Bearer " + key;
+      if (currentProvider === "openrouter") {
+        headers["HTTP-Referer"] = window.location.origin;
+        headers["X-Title"] = "LLM Playground Pro";
+      }
+
+      const resp = await fetch(baseUrl + "/models", { headers });
+      if (resp.ok) {
+        const json = await resp.json();
+        const rawList = Array.isArray(json.data) ? json.data : (Array.isArray(json.models) ? json.models : []);
+        
+        // Filter out whisper/audio/embedding models
+        const filtered = rawList
+          .map(m => (typeof m === "string" ? m : (m.id || m.name)))
+          .filter(id => id && !/whisper|tts|embed|guard|moderation|dall-e/i.test(id))
+          .sort();
+
+        if (filtered.length > 0) {
+          populateModelDropdown(filtered, false);
+          $("modelStatus").textContent = filtered.length + " live models loaded from " + cfg.name;
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Live model fetch failed, using curated fallback list:", e);
+    }
+  }
+
+  // Fallback list
+  populateModelDropdown(cfg.fallbackModels, true);
+  $("modelStatus").textContent = "Showing curated models (paste key for live list)";
+}
+
+function populateModelDropdown(models, isFallback) {
+  activeModels = models;
+  const select = $("modelSelect");
+  const previous = select.value;
+  select.innerHTML = "";
+
+  const group = document.createElement("optgroup");
+  group.label = isFallback ? "Curated Models List" : "Live Models from API";
+
+  for (const m of models) {
+    const isReasoning = /r1|o1|o3|reason|thinking/i.test(m);
+    const label = m + (isReasoning ? " 🧠 (Reasoning)" : "");
+    group.append(new Option(label, m));
+  }
+  select.append(group);
+
+  // Restore selection or select default
+  if (models.includes(previous)) {
+    select.value = previous;
+  } else if (models.includes(PROVIDER_CONFIGS[currentProvider].defaultModel)) {
+    select.value = PROVIDER_CONFIGS[currentProvider].defaultModel;
+  } else {
+    select.value = models[0] || "";
+  }
+
+  // Update arena pickers as well
+  populateArenaModelPickers(models);
+  handleModelChange();
+}
+
+function populateArenaModelPickers(models) {
+  const selA = $("arenaModelASelect");
+  const selB = $("arenaModelBSelect");
+  if (!selA || !selB) return;
+  
+  selA.innerHTML = "";
+  selB.innerHTML = "";
+  models.forEach((m, idx) => {
+    selA.append(new Option(m, m));
+    selB.append(new Option(m, m));
+  });
+  if (models.length > 1) selB.selectedIndex = 1;
+}
+
+function handleModelChange() {
+  const model = $("modelSelect").value;
+  const isReasoning = /r1|o1|o3|reason|thinking|gpt-oss/i.test(model);
+  
+  if (isReasoning) {
+    $("reasoningToggle").checked = true;
+    $("reasoningSupportNote").textContent = "Reasoning model active";
+    $("reasoningEffortWrapper").hidden = false;
+  } else {
+    $("reasoningEffortWrapper").hidden = true;
+    $("reasoningSupportNote").textContent = "Optional or not supported on this model";
+  }
+}
+
+/* ==================================================================
+   6. PROMPT ANALYSIS ENGINE (HEURISTICS & FEW-SHOT MATCHER)
+   Runs entirely client-side with zero external API calls.
+   ================================================================== */
+function analyzePrompt(text) {
+  if (!text) text = "";
+  const lines = text.split("\n");
+
+  const ioFound = [];
+  const qaFound = [];
+  const arrowFound = [];
+
+  let openInput = false;
+  let openQ = false;
+  let unhandledOutput = 0;
+  let unhandledA = 0;
+
+  for (const line of lines) {
+    if (/^\s*Input\s*:/i.test(line)) { openInput = true; continue; }
+    const mOut = line.match(/^\s*Output\s*:(.*)$/i);
+    if (mOut && openInput) {
+      openInput = false;
+      if (mOut[1].trim()) ioFound.push(line.trim());
+      else unhandledOutput++;
+    }
+
+    if (/^\s*Q\s*:/i.test(line)) { openQ = true; continue; }
+    const mA = line.match(/^\s*A\s*:(.*)$/i);
+    if (mA && openQ) {
+      openQ = false;
+      if (mA[1].trim()) qaFound.push(line.trim());
+      else unhandledA++;
+    }
+
+    if (/\S+\s*(?:->|=>)\s*\S+/.test(line)) {
+      arrowFound.push(line.trim());
+    }
+  }
+
+  const blocks = text.split(/^\s*(?:###|---)\s*$/m).filter(b => b.trim());
+  const blockExamples = blocks.length > 2 ? blocks.length - 1 : 0;
+
+  const exampleRules = [
+    {
+      label: "Input / Output pairs with answer",
+      count: ioFound.length,
+      quotes: ioFound,
+      note: unhandledOutput ? (unhandledOutput + " empty Output: ignored (completion target)") : ""
+    },
+    {
+      label: "Q / A question-answer pairs with answer",
+      count: qaFound.length,
+      quotes: qaFound,
+      note: unhandledA ? (unhandledA + " empty A: ignored (completion target)") : ""
+    },
+    {
+      label: "Mapping arrows (-> or =>)",
+      count: arrowFound.length,
+      quotes: arrowFound,
+      note: ""
+    },
+    {
+      label: "Delimited blocks (### / ---)",
+      count: blockExamples,
+      quotes: blockExamples ? [blocks.length + " blocks found"] : [],
+      note: blockExamples ? "Every block except last acts as an exemplar" : ""
+    }
+  ];
+
+  const maxExamples = Math.max(ioFound.length, qaFound.length, arrowFound.length, blockExamples);
+
+  const techniques = [
+    { name: "Chain-of-Thought", pattern: /think step by step|step-by-step|let'?s think|break down/i, hint: "Step-by-step reasoning" },
+    { name: "Role Prompting", pattern: /you are an?|act as|pretend you are|expert in|role of/i, hint: "Persona or role prompt" },
+    { name: "Negative Constraint", pattern: /\b(?:do not|never|avoid|without|no explanations)\b/i, hint: "Explicit negative instruction" },
+    { name: "Format Constraint", pattern: /\b(?:json|xml|csv|markdown table|yaml|schema)\b/i, hint: "Structured output format" },
+    { name: "Delimiters & Tags", pattern: /```|<[a-z_]+>|<\/[a-z_]+>|###/i, hint: "Structural section tags" },
+    { name: "Context / Grounding", pattern: /\b(?:context|passage|reference text|document|excerpt)\s*:/i, hint: "Grounded reference context" }
+  ].map(t => {
+    const m = text.match(t.pattern);
+    return {
+      name: t.name,
+      fired: !!m,
+      quote: m ? m[0] : "",
+      hint: t.hint
+    };
+  });
+
+  return {
+    exampleCount: maxExamples,
+    verdict: maxExamples === 0 ? "ZERO-SHOT" : (maxExamples === 1 ? "ONE-SHOT" : ("FEW-SHOT (" + maxExamples + ")")),
+    exampleRules,
+    techniques
+  };
+}
+
+function analyzeCurrentPrompt() {
+  const text = $("promptInput").value;
+  const analysisTarget = text.trim() ? text : lastSentPrompt;
+  const res = analyzePrompt(analysisTarget);
+
+  $("verdictTag").textContent = res.verdict;
+  $("exampleCountPill").textContent = res.exampleCount + " Example" + (res.exampleCount === 1 ? "" : "s");
+
+  const chipsContainer = $("techniqueChips");
+  chipsContainer.innerHTML = "";
+  res.techniques.forEach(t => {
+    const chip = document.createElement("span");
+    chip.className = "tech-chip" + (t.fired ? " active" : "");
+    chip.textContent = (t.fired ? "✓ " : "") + t.name;
+    chip.title = t.hint;
+    chipsContainer.append(chip);
+  });
+
+  const list = $("analysisWhyList");
+  list.innerHTML = "";
+  
+  res.exampleRules.forEach(r => {
+    const li = document.createElement("li");
+    li.className = "analysis-item" + (r.count > 0 ? "" : " off");
+    let quotesHtml = "";
+    if (r.quotes && r.quotes.length > 0) {
+      quotesHtml = " — " + r.quotes.slice(0, 2).map(q => "<q>" + escapeHtml(q.length > 35 ? q.slice(0, 35) + "…" : q) + "</q>").join(", ");
+      if (r.quotes.length > 2) quotesHtml += " +" + (r.quotes.length - 2) + " more";
+    }
+    const noteHtml = r.note ? '<div class="field-hint" style="font-size:10px; margin-left:14px;">' + escapeHtml(r.note) + '</div>' : "";
+    li.innerHTML = "<div><span>" + (r.count > 0 ? "✓" : "✗") + "</span> <span>" + escapeHtml(r.label) + ": <strong>" + r.count + "</strong>" + quotesHtml + "</span>" + noteHtml + "</div>";
+    list.append(li);
+  });
+
+  res.techniques.forEach(t => {
+    const li = document.createElement("li");
+    li.className = "analysis-item" + (t.fired ? "" : " off");
+    const quoteHtml = t.fired && t.quote ? " — <q>" + escapeHtml(t.quote) + "</q>" : "";
+    li.innerHTML = "<div><span>" + (t.fired ? "✓" : "✗") + "</span> <span>" + escapeHtml(t.name) + (t.fired ? "" : ": not detected") + quoteHtml + "</span></div>";
+    list.append(li);
+  });
+}
+
+function updateCharCount() {
+  const text = $("promptInput").value;
+  const chars = text.length;
+  const estimatedTokens = Math.ceil(chars / 3.8);
+  $("charCounter").textContent = chars.toLocaleString() + " chars · ~" + estimatedTokens.toLocaleString() + " tokens";
+}
+
+function updateContextStats() {
+  const turns = conversation.length;
+  let totalChars = 0;
+  conversation.forEach(m => totalChars += (m.content || "").length);
+  const sys = $("systemPromptInput").value;
+  totalChars += sys.length;
+  const estTokens = Math.ceil(totalChars / 3.8);
+
+  $("chatTurnsCount").textContent = turns + " message" + (turns === 1 ? "" : "s") + " in context";
+  $("contextTokenEst").textContent = "Estimated context: ~" + estTokens.toLocaleString() + " tokens";
+}
+
+/* ==================================================================
+   7. CHAT DISPATCH, STREAMING & ARENA MODE
+   ================================================================== */
+function friendlyError(status, message) {
+  const m = (message || "").toLowerCase();
+  if (status === 401) return "The API key was rejected. Verify your key on your provider dashboard.";
+  if (status === 429) return "Rate limit reached: quota exhausted. Wait a moment or reduce Max Output Tokens.";
+  if (status === 413 || /context.*(length|window|too long|exceed)|too long|maximum context/i.test(m)) {
+    return 'Context window exceeded. Click "Reset Conversation" to start fresh.';
+  }
+  if ((status === 400 || status === 404) && m.includes("model") && /decommission|not found|does not exist|unknown|no longer/i.test(m)) {
+    return "This model is currently unavailable or decommissioned. Select another model.";
+  }
+  if (/fetch|network|failed to fetch|cors/i.test(m)) {
+    return "Network connection error. Check your internet connection or CORS settings.";
+  }
+  return "API Error" + (status ? " (HTTP " + status + ")" : "") + ": " + (message || "Request failed");
+}
+
+async function submitPrompt() {
+  const key = getKey();
+  const text = $("promptInput").value.trim();
+
+  if (currentProvider !== "ollama" && !key) {
+    alert("Please enter your API Key in the left sidebar to send requests.");
+    $("apiKeyInput").focus();
+    return;
+  }
+
+  if (!text) return;
+
+  if (isArenaMode) {
+    return submitArenaPrompt(text);
+  }
+
+  conversation.push({ role: "user", content: text });
+  lastSentPrompt = text;
+  $("promptInput").value = "";
+  updateCharCount();
+  updateContextStats();
+  analyzeCurrentPrompt();
+
+  $("emptyState").hidden = true;
+  appendUserMessage(text);
+
+  const assistantView = createAssistantBubble();
+  const requestBody = buildRequestBody();
+  assistantView.requestPre.textContent = JSON.stringify(requestBody, null, 2);
+
+  setStreamingState(true);
+  abortController = new AbortController();
+
+  const res = await streamModelExecution(requestBody, assistantView, abortController.signal);
+
+  setStreamingState(false);
+  abortController = null;
+  updateContextStats();
+
+  if (res && res.answer && res.answer.trim()) {
+    conversation.push({ role: "assistant", content: res.answer });
+  }
+}
+
+async function submitArenaPrompt(text) {
+  const modelA = $("arenaModelASelect").value;
+  const modelB = $("arenaModelBSelect").value;
+
+  lastSentPrompt = text;
+  $("promptInput").value = "";
+  updateCharCount();
+  analyzeCurrentPrompt();
+
+  appendArenaUserMessage($("arenaTranscriptA"), text);
+  appendArenaUserMessage($("arenaTranscriptB"), text);
+
+  const viewA = createArenaAssistantBubble($("arenaTranscriptA"), modelA);
+  const viewB = createArenaAssistantBubble($("arenaTranscriptB"), modelB);
+
+  const bodyA = { ...buildRequestBody(), model: modelA };
+  const bodyB = { ...buildRequestBody(), model: modelB };
+
+  setStreamingState(true);
+  abortController = new AbortController();
+
+  let resA = null;
+  let resB = null;
+
+  await Promise.allSettled([
+    streamModelExecution(bodyA, viewA, abortController.signal).then(r => { resA = r; }),
+    streamModelExecution(bodyB, viewB, abortController.signal).then(r => { resB = r; })
+  ]);
+
+  setStreamingState(false);
+  abortController = null;
+
+  if (resA && resB) {
+    const diff = (resA.totalSeconds - resB.totalSeconds).toFixed(2);
+    let winMsg = "";
+    if (resA.totalSeconds < resB.totalSeconds) {
+      winMsg = "🏆 Model A (" + modelA + ") completed " + Math.abs(diff) + "s faster!";
+    } else if (resB.totalSeconds < resA.totalSeconds) {
+      winMsg = "🏆 Model B (" + modelB + ") completed " + Math.abs(diff) + "s faster!";
+    } else {
+      winMsg = "🤝 Both models completed in " + resA.totalSeconds + "s!";
+    }
+
+    const banner = document.createElement("div");
+    banner.style.cssText = "padding:10px 14px; background:linear-gradient(135deg, rgba(99,102,241,0.2), rgba(16,185,129,0.2)); border:1px solid var(--primary); border-radius:8px; font-weight:600; font-size:12px; color:var(--text-strong); text-align:center; margin:10px 0;";
+    banner.innerHTML = winMsg + ' <span style="color:var(--text-muted); font-size:11px; margin-left:8px;">Model A: ' + resA.tps + ' tps (' + resA.ttft + 'ms TTFT) vs Model B: ' + resB.tps + ' tps (' + resB.ttft + 'ms TTFT)</span>';
+    
+    $("arenaTranscriptA").append(banner.cloneNode(true));
+    $("arenaTranscriptB").append(banner);
+  }
+}
+
+async function streamModelExecution(requestBody, view, signal) {
+  const key = getKey();
+  const startTime = performance.now();
+  let firstTokenTime = null;
+  let accumulatedAnswer = "";
+  let accumulatedThinking = "";
+  let totalUsage = null;
+  let finishReason = null;
+  const sources = [];
+
+  try {
+    const headers = { "Content-Type": "application/json" };
+    if (key) headers["Authorization"] = "Bearer " + key;
+    if (currentProvider === "openrouter") {
+      headers["HTTP-Referer"] = window.location.origin;
+      headers["X-Title"] = "LLM Playground Pro";
+    }
+
+    const resp = await fetch(getEffectiveBaseUrl() + "/chat/completions", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(requestBody),
+      signal
+    });
+
+    handleRateLimitHeaders(resp.headers);
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      let parsedMsg = errText;
+      try {
+        const parsed = JSON.parse(errText);
+        parsedMsg = parsed.error?.message || errText;
+      } catch (e) {}
+      throw new Error(friendlyError(resp.status, parsedMsg));
+    }
+
+    if (!requestBody.stream) {
+      const json = await resp.json();
+      const choice = json.choices?.[0];
+      accumulatedAnswer = choice?.message?.content || "";
+      totalUsage = json.usage;
+      finishReason = choice?.finish_reason || "stop";
+      firstTokenTime = performance.now();
+      view.answerBody.innerHTML = renderMarkdown(accumulatedAnswer);
+    } else {
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const data = trimmed.slice(5).trim();
+          if (data === "[DONE]") continue;
+
+          try {
+            const chunk = JSON.parse(data);
+            const usage = chunk.usage || chunk.x_groq?.usage;
+            if (usage) totalUsage = usage;
+
+            const choice = chunk.choices?.[0];
+            if (!choice) continue;
+
+            const delta = choice.delta || {};
+
+            if (delta.executed_tools) {
+              delta.executed_tools.forEach(tool => {
+                const results = tool.search_results?.results || [];
+                results.forEach(r => {
+                  if (r?.url && !sources.some(s => s.url === r.url)) {
+                    sources.push({ title: r.title || r.url, url: r.url });
+                  }
+                });
+              });
+              renderSources(view.sourcesContainer, sources);
+            }
+
+            const reasoning = delta.reasoning || delta.reasoning_content;
+            if (reasoning) {
+              accumulatedThinking += reasoning;
+              view.thinkingBox.hidden = false;
+              view.thinkingContent.textContent = accumulatedThinking;
+              view.thinkingSummary.innerHTML = 'Thinking... <span class="stream-spinner"></span>';
+            }
+
+            if (delta.content) {
+              if (firstTokenTime === null) {
+                firstTokenTime = performance.now();
+                view.thinkingBox.open = false;
+                view.thinkingSummary.textContent = "Thought Process (click to expand)";
+              }
+              accumulatedAnswer += delta.content;
+              view.answerBody.innerHTML = renderMarkdown(accumulatedAnswer);
+              scrollTranscript();
+            }
+
+            if (choice.finish_reason) finishReason = choice.finish_reason;
+          } catch (e) {}
+        }
+      }
+    }
+
+    const endTime = performance.now();
+    const ttft = firstTokenTime ? Math.round(firstTokenTime - startTime) : null;
+    const totalSeconds = ((endTime - startTime) / 1000).toFixed(2);
+    const outputTokens = totalUsage?.completion_tokens || Math.ceil(accumulatedAnswer.length / 3.8);
+    const streamSec = firstTokenTime ? (endTime - firstTokenTime) / 1000 : 0;
+    const tps = (streamSec > 0 && outputTokens > 0) ? Math.round(outputTokens / streamSec) : "–";
+
+    finishAssistantReply(view, {
+      answer: accumulatedAnswer,
+      thinking: accumulatedThinking,
+      finishReason: finishReason || "stop",
+      sources,
+      usage: totalUsage,
+      startTime,
+      firstTokenTime,
+      endTime
+    });
+
+    return { ttft, totalSeconds, tps, outputTokens, answer: accumulatedAnswer };
+
+  } catch (err) {
+    if (err.name === "AbortError") {
+      view.finishBadge.textContent = "Stopped by user";
+      view.finishBadge.className = "finish-badge abort";
+      view.finishBadge.hidden = false;
+    } else {
+      view.answerBody.innerHTML += '<div style="padding:10px; border-radius:6px; background:var(--rose-dim); border:1px solid var(--rose); color:var(--rose); margin-top:8px;">⚠️ ' + escapeHtml(err.message) + '</div>';
+    }
+    return null;
+  }
+}
+
+function buildRequestBody() {
+  const model = $("modelSelect").value;
+  const messages = [];
+
+  const sys = $("systemPromptInput").value.trim();
+  if (sys) messages.push({ role: "system", content: sys });
+
+  for (const m of conversation) {
+    messages.push({ role: m.role, content: m.content });
+  }
+
+  const body = {
+    model,
+    messages,
+    temperature: parseFloat($("tempRange").value),
+    top_p: parseFloat($("topPRange").value),
+    max_tokens: parseInt($("maxTokensRange").value, 10),
+    stream: $("streamToggle").checked
+  };
+
+  const stop = $("stopSeqInput").value.split(",").map(s => s.trim()).filter(Boolean);
+  if (stop.length > 0) body.stop = stop.slice(0, 4);
+
+  const freq = parseFloat($("freqPenRange").value);
+  if (freq !== 0) body.frequency_penalty = freq;
+
+  const pres = parseFloat($("presPenRange").value);
+  if (pres !== 0) body.presence_penalty = pres;
+
+  const seed = parseInt($("seedInput").value, 10);
+  if (!isNaN(seed)) body.seed = seed;
+
+  if ($("responseFormatSelect").value === "json_object") {
+    body.response_format = { type: "json_object" };
+  }
+
+  if ($("webSearchToggle").checked && !$("webSearchToggle").disabled) {
+    body.tools = [{ type: "browser_search" }];
+  }
+
+  if ($("reasoningToggle").checked) {
+    body.reasoning_effort = $("reasoningEffortSelect").value;
+    body.include_reasoning = true;
+  }
+
+  if (body.stream) {
+    body.stream_options = { include_usage: true };
+  }
+
+  return body;
+}
+
+function setStreamingState(streaming) {
+  isStreaming = streaming;
+  $("sendBtn").className = streaming ? "btn stop" : "btn primary";
+  $("sendBtnIcon").textContent = streaming ? "⏹" : "▶";
+  $("sendBtnText").textContent = streaming ? "Stop" : "Submit";
+}
+
+/* ==================================================================
+   8. CHAT BUBBLES UI CREATION & MESSAGE ACTIONS
+   ================================================================== */
+function appendUserMessage(text) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "message-wrapper user";
+  
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
+  meta.innerHTML = '<span class="role-badge user">USER</span> <span>' + new Date().toLocaleTimeString() + '</span>' +
+    '<span style="margin-left:auto; display:flex; gap:6px;">' +
+      '<button class="action-btn" title="Copy prompt" onclick="copyUserMsg(this)">📋</button>' +
+      '<button class="action-btn" title="Edit prompt" onclick="editUserMsg(this)">✏️ Edit</button>' +
+    '</span>';
+  
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble user";
+  bubble.textContent = text;
+
+  wrapper.append(meta, bubble);
+  $("transcript").append(wrapper);
+  scrollTranscript();
+}
+
+function copyUserMsg(btn) {
+  const text = btn.closest(".message-wrapper").querySelector(".message-bubble").textContent;
+  navigator.clipboard.writeText(text);
+  btn.textContent = "✓";
+  setTimeout(() => { btn.textContent = "📋"; }, 1200);
+}
+
+function editUserMsg(btn) {
+  const wrapper = btn.closest(".message-wrapper");
+  const text = wrapper.querySelector(".message-bubble").textContent;
+  $("promptInput").value = text;
+  $("promptInput").focus();
+  updateCharCount();
+  analyzeCurrentPrompt();
+
+  const allUserWrappers = Array.from(document.querySelectorAll("#transcript .message-wrapper.user"));
+  const idx = allUserWrappers.indexOf(wrapper);
+  if (idx !== -1) {
+    conversation = conversation.slice(0, idx * 2);
+    let cur = wrapper;
+    while (cur) {
+      const next = cur.nextElementSibling;
+      cur.remove();
+      cur = next;
+    }
+    updateContextStats();
+  }
+}
+
+function appendArenaUserMessage(container, text) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "message-wrapper user";
+  wrapper.innerHTML = '<div class="message-meta"><span class="role-badge user">USER</span> <span>' + new Date().toLocaleTimeString() + '</span></div>' +
+    '<div class="message-bubble user" style="max-width:95%;">' + escapeHtml(text) + '</div>';
+  container.append(wrapper);
+  container.scrollTop = container.scrollHeight;
+}
+
+function createArenaAssistantBubble(container, modelName) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "message-wrapper assistant";
+
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
+  meta.innerHTML = '<span class="role-badge assistant">ARENA</span> <span>' + escapeHtml(modelName) + '</span>';
+
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble assistant";
+
+  const thinkingBox = document.createElement("details");
+  thinkingBox.className = "thinking-box";
+  thinkingBox.hidden = true;
+  thinkingBox.open = true;
+  thinkingBox.innerHTML = '<summary class="thinking-summary">Thinking...</summary><div class="thinking-content"></div>';
+
+  const sourcesContainer = document.createElement("div");
+  sourcesContainer.className = "sources-grid";
+
+  const answerBody = document.createElement("div");
+  answerBody.className = "markdown-body";
+  answerBody.innerHTML = '<span style="color:var(--text-muted); font-style:italic;">Generating tokens...</span>';
+
+  const actionsBar = document.createElement("div");
+  actionsBar.className = "message-actions";
+  actionsBar.innerHTML = '<button class="action-btn copy-btn">📋 Copy</button><span class="finish-badge stop" hidden></span>';
+
+  bubble.append(thinkingBox, sourcesContainer, answerBody, actionsBar);
+  wrapper.append(meta, bubble);
+  container.append(wrapper);
+  container.scrollTop = container.scrollHeight;
+
+  return {
+    wrapper,
+    container,
+    thinkingBox,
+    thinkingSummary: thinkingBox.querySelector(".thinking-summary"),
+    thinkingContent: thinkingBox.querySelector(".thinking-content"),
+    sourcesContainer,
+    answerBody,
+    actionsBar,
+    copyBtn: actionsBar.querySelector(".copy-btn"),
+    finishBadge: actionsBar.querySelector(".finish-badge")
+  };
+}
+
+function createAssistantBubble() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "message-wrapper assistant";
+
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
+  meta.innerHTML = '<span class="role-badge assistant">ASSISTANT</span> <span>' + $("modelSelect").value + '</span>';
+
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble assistant";
+
+  const requestDetails = document.createElement("details");
+  requestDetails.className = "request-details";
+  requestDetails.innerHTML = '<summary>Request Payload JSON (Sent directly to API)</summary><pre></pre>';
+
+  const thinkingBox = document.createElement("details");
+  thinkingBox.className = "thinking-box";
+  thinkingBox.hidden = true;
+  thinkingBox.open = true;
+  thinkingBox.innerHTML = '<summary class="thinking-summary">Thinking...</summary><div class="thinking-content"></div>';
+
+  const sourcesContainer = document.createElement("div");
+  sourcesContainer.className = "sources-grid";
+
+  const answerBody = document.createElement("div");
+  answerBody.className = "markdown-body";
+  answerBody.innerHTML = '<span style="color:var(--text-muted); font-style:italic;">Connecting and awaiting tokens...</span>';
+
+  const actionsBar = document.createElement("div");
+  actionsBar.className = "message-actions";
+  actionsBar.innerHTML = '<button class="action-btn copy-btn" title="Copy answer">📋 Copy</button>' +
+    '<button class="action-btn speak-btn" title="Speak aloud using speech synthesis">🔊 Speak</button>' +
+    '<button class="action-btn regen-btn" title="Regenerate this response">🔄 Regenerate</button>' +
+    '<span class="finish-badge stop" hidden></span>';
+
+  bubble.append(requestDetails, thinkingBox, sourcesContainer, answerBody, actionsBar);
+  wrapper.append(meta, bubble);
+  $("transcript").append(wrapper);
+  scrollTranscript();
+
+  return {
+    wrapper,
+    container: $("transcript"),
+    requestPre: requestDetails.querySelector("pre"),
+    thinkingBox,
+    thinkingSummary: thinkingBox.querySelector(".thinking-summary"),
+    thinkingContent: thinkingBox.querySelector(".thinking-content"),
+    sourcesContainer,
+    answerBody,
+    actionsBar,
+    copyBtn: actionsBar.querySelector(".copy-btn"),
+    speakBtn: actionsBar.querySelector(".speak-btn"),
+    regenBtn: actionsBar.querySelector(".regen-btn"),
+    finishBadge: actionsBar.querySelector(".finish-badge")
+  };
+}
+
+function finishAssistantReply(view, stats) {
+  view.finishBadge.hidden = false;
+  view.finishBadge.textContent = "Finished: " + stats.finishReason;
+  if (stats.finishReason === "length") {
+    view.finishBadge.className = "finish-badge length";
+    view.finishBadge.title = "Hit Max Output Tokens limit!";
+  } else {
+    view.finishBadge.className = "finish-badge stop";
+  }
+
+  view.copyBtn.onclick = () => {
+    navigator.clipboard.writeText(stats.answer);
+    view.copyBtn.textContent = "✓ Copied!";
+    setTimeout(() => { view.copyBtn.textContent = "📋 Copy"; }, 1500);
+  };
+
+  if (view.speakBtn) {
+    view.speakBtn.onclick = () => toggleSpeech(stats.answer, view.speakBtn);
+  }
+
+  if (view.regenBtn) {
+    view.regenBtn.onclick = () => {
+      if (isStreaming) return;
+      if (conversation.length > 0 && conversation[conversation.length - 1].role === "assistant") {
+        conversation.pop();
+      }
+      view.wrapper.remove();
+      const lastUser = conversation[conversation.length - 1];
+      if (lastUser && lastUser.role === "user") {
+        const assistantView = createAssistantBubble();
+        const requestBody = buildRequestBody();
+        assistantView.requestPre.textContent = JSON.stringify(requestBody, null, 2);
+        setStreamingState(true);
+        abortController = new AbortController();
+        streamModelExecution(requestBody, assistantView, abortController.signal).then(res => {
+          setStreamingState(false);
+          abortController = null;
+          updateContextStats();
+          if (res && res.answer && res.answer.trim()) {
+            conversation.push({ role: "assistant", content: res.answer });
+          }
+        });
+      }
+    };
+  }
+
+  const ttft = stats.firstTokenTime ? Math.round(stats.firstTokenTime - stats.startTime) : null;
+  const totalSeconds = ((stats.endTime - stats.startTime) / 1000).toFixed(2);
+  
+  let tps = "–";
+  const outputTokens = stats.usage?.completion_tokens || Math.ceil(stats.answer.length / 3.8);
+  if (stats.firstTokenTime && outputTokens > 0) {
+    const streamDurationSec = (stats.endTime - stats.firstTokenTime) / 1000;
+    if (streamDurationSec > 0) tps = Math.round(outputTokens / streamDurationSec);
+  }
+
+  $("metricTtft").textContent = ttft ? (ttft + "") : "–";
+  $("metricTotalTime").textContent = totalSeconds;
+  $("metricTps").textContent = tps;
+
+  const inTokens = stats.usage?.prompt_tokens || Math.ceil(lastSentPrompt.length / 3.8);
+  const reasoningTokens = stats.usage?.completion_tokens_details?.reasoning_tokens || 0;
+  const outTokens = stats.usage?.completion_tokens || outputTokens;
+  const totalToks = stats.usage?.total_tokens || (inTokens + outTokens);
+
+  $("usageInputTokens").textContent = inTokens.toLocaleString();
+  $("usageReasoningTokens").textContent = reasoningTokens ? reasoningTokens.toLocaleString() : "0";
+  $("usageOutputTokens").textContent = outTokens.toLocaleString();
+  $("usageTotalTokens").textContent = totalToks.toLocaleString();
+
+  const cfg = PROVIDER_CONFIGS[currentProvider];
+  const cost = (inTokens * cfg.pricing.inputPerM / 1e6) + (outTokens * cfg.pricing.outputPerM / 1e6);
+  $("estimatedCostBadge").textContent = "~$" + cost.toFixed(5);
+
+  addRunHistoryItem({
+    model: $("modelSelect").value,
+    tokens: totalToks,
+    tps,
+    time: totalSeconds,
+    timestamp: new Date().toLocaleTimeString()
+  });
+}
+
+function renderSources(container, sources) {
+  if (!container) return;
+  container.innerHTML = "";
+  sources.forEach((s, idx) => {
+    const a = document.createElement("a");
+    a.className = "source-item";
+    a.href = s.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    
+    let hostname = s.url;
+    try { hostname = new URL(s.url).hostname; } catch (e) {}
+
+    a.innerHTML = '<span class="source-title">[' + (idx + 1) + '] ' + escapeHtml(s.title) + '</span><span class="source-url">' + escapeHtml(hostname) + '</span>';
+    container.append(a);
+  });
+}
+
+function handleRateLimitHeaders(headers) {
+  if (!headers) return;
+  const remaining = headers.get("x-ratelimit-remaining-tokens");
+  const reset = headers.get("x-ratelimit-reset-tokens");
+  if (remaining !== null) {
+    $("usageRateLimitLeft").textContent = parseInt(remaining, 10).toLocaleString();
+    if (reset) $("rateLimitResetHint").textContent = "Quota resets in " + reset;
+  }
+}
+
+function scrollTranscript() {
+  const t = $("transcript");
+  if (t) t.scrollTop = t.scrollHeight;
+}
+
+/* ==================================================================
+   9. MARKDOWN PARSER (SAFE, LIGHTWEIGHT, ZERO DEPENDENCY)
+   ================================================================== */
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderMarkdown(rawText) {
+  if (!rawText) return "";
+  const parts = escapeHtml(rawText).split("```");
+
+  return parts.map((part, idx) => {
+    if (idx % 2 === 1) {
+      const newlineIndex = part.indexOf("\n");
+      const lang = newlineIndex !== -1 ? part.slice(0, newlineIndex).trim() : "";
+      const code = newlineIndex !== -1 ? part.slice(newlineIndex + 1) : part;
+
+      return '<div class="code-block-wrapper">' +
+        '<div class="code-block-header">' +
+          '<span>' + (lang || "code") + '</span>' +
+          '<button class="pill-btn" onclick="copyBlockCode(this)">Copy</button>' +
+        '</div>' +
+        '<pre><code>' + code.replace(/\n$/, "") + '</code></pre>' +
+      '</div>';
+    }
+
+    let html = part;
+    html = html.replace(/\$\$([\s\S]+?)\$\$/g, '<div class="math-block">$1</div>');
+    html = html.replace(/\$([^\$\n]+?)\$/g, '<span class="math-block" style="display:inline; padding:1px 4px;">$1</span>');
+
+    const lines = html.split("\n");
+    let result = "";
+    let inList = false;
+
+    for (const line of lines) {
+      if (/^#{3}\s+(.+)$/.test(line)) {
+        if (inList) { result += "</ul>"; inList = false; }
+        result += "<h3>" + formatInline(line.replace(/^#{3}\s+/, "")) + "</h3>";
+      } else if (/^#{2}\s+(.+)$/.test(line)) {
+        if (inList) { result += "</ul>"; inList = false; }
+        result += "<h2>" + formatInline(line.replace(/^#{2}\s+/, "")) + "</h2>";
+      } else if (/^#{1}\s+(.+)$/.test(line)) {
+        if (inList) { result += "</ul>"; inList = false; }
+        result += "<h1>" + formatInline(line.replace(/^#{1}\s+/, "")) + "</h1>";
+      } else if (/^\s*[-*]\s+(.+)$/.test(line)) {
+        if (!inList) { result += "<ul>"; inList = true; }
+        result += "<li>" + formatInline(line.replace(/^\s*[-*]\s+/, "")) + "</li>";
+      } else if (/^\s*\d+\.\s+(.+)$/.test(line)) {
+        if (!inList) { result += "<ol>"; inList = true; }
+        result += "<li>" + formatInline(line.replace(/^\s*\d+\.\s+/, "")) + "</li>";
+      } else if (line.trim() === "") {
+        if (inList) { result += "</ul>"; inList = false; }
+        result += "<br>";
+      } else {
+        if (inList) { result += "</ul>"; inList = false; }
+        result += "<p>" + formatInline(line) + "</p>";
+      }
+    }
+    if (inList) result += "</ul>";
+
+    return result;
+  }).join("");
+}
+
+function formatInline(str) {
+  return str
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/~~([^~]+)~~/g, "<del>$1</del>");
+}
+
+function copyBlockCode(btn) {
+  const code = btn.closest(".code-block-wrapper").querySelector("code").textContent;
+  navigator.clipboard.writeText(code);
+  btn.textContent = "Copied!";
+  setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+}
+
+/* ==================================================================
+   10. WEB SPEECH API (TEXT-TO-SPEECH)
+   ================================================================== */
+let currentUtterance = null;
+
+function toggleSpeech(text, btn) {
+  if (!('speechSynthesis' in window)) {
+    alert("Speech Synthesis is not supported in this browser.");
+    return;
+  }
+
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    btn.textContent = "🔊 Speak";
+    return;
+  }
+
+  const cleanText = text
+    .replace(/```[\s\S]*?```/g, "Code block omitted.")
+    .replace(/[*#`_~]/g, "");
+
+  currentUtterance = new SpeechSynthesisUtterance(cleanText);
+  currentUtterance.rate = 1.0;
+  
+  btn.textContent = "⏹ Stop Voice";
+  currentUtterance.onend = () => { btn.textContent = "🔊 Speak"; };
+  currentUtterance.onerror = () => { btn.textContent = "🔊 Speak"; };
+
+  window.speechSynthesis.speak(currentUtterance);
+}
+
+
+/* ==================================================================
+   11. CODE EXPORT GENERATOR (cURL, PYTHON, JS, NODE)
+   ================================================================== */
+function generateCodeSnippets() {
+  const body = buildRequestBody();
+  const baseUrl = getEffectiveBaseUrl();
+
+  // 1. cURL
+  const curl = [
+    `curl -N "${baseUrl}/chat/completions" \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -H "Authorization: Bearer $API_KEY" \\`,
+    `  -d '${JSON.stringify(body, null, 2).replace(/'/g, "'\\''")}'`
+  ].join("\n");
+
+  // 2. Python (OpenAI SDK)
+  const python = [
+    "import os",
+    "from openai import OpenAI",
+    "",
+    "client = OpenAI(",
+    `    base_url="${baseUrl}",`,
+    '    api_key=os.environ.get("API_KEY")',
+    ")",
+    "",
+    "response = client.chat.completions.create(",
+    `    model="${body.model}",`,
+    `    messages=${JSON.stringify(body.messages, null, 8)},`,
+    `    temperature=${body.temperature},`,
+    `    max_tokens=${body.max_tokens},`,
+    `    stream=True,`,
+    ")",
+    "",
+    "for chunk in response:",
+    "    if chunk.choices and chunk.choices[0].delta.content:",
+    '        print(chunk.choices[0].delta.content, end="", flush=True)',
+    "print()"
+  ].join("\n");
+
+  // 3. JavaScript Fetch
+  const js = [
+    `const response = await fetch("${baseUrl}/chat/completions", {`,
+    '  method: "POST",',
+    '  headers: {',
+    '    "Content-Type": "application/json",',
+    '    "Authorization": `Bearer ${process.env.API_KEY}`',
+    '  },',
+    `  body: JSON.stringify(${JSON.stringify(body, null, 4)})`,
+    "});",
+    "",
+    "const reader = response.body.getReader();",
+    "const decoder = new TextDecoder();",
+    "while (true) {",
+    "  const { value, done } = await reader.read();",
+    "  if (done) break;",
+    "  console.log(decoder.decode(value));",
+    "}"
+  ].join("\n");
+
+  // 4. Node.js (OpenAI SDK)
+  const node = [
+    'import OpenAI from "openai";',
+    "",
+    "const openai = new OpenAI({",
+    `  baseURL: "${baseUrl}",`,
+    "  apiKey: process.env.API_KEY,",
+    "});",
+    "",
+    "const stream = await openai.chat.completions.create({",
+    `  model: "${body.model}",`,
+    `  messages: ${JSON.stringify(body.messages, null, 2)},`,
+    `  temperature: ${body.temperature},`,
+    `  max_tokens: ${body.max_tokens},`,
+    "  stream: true,",
+    "});",
+    "",
+    "for await (const chunk of stream) {",
+    "  process.stdout.write(chunk.choices[0]?.delta?.content || '');",
+    "}"
+  ].join("\n");
+
+  return { curl, python, js, node };
+}
+
+function switchCodeTab(tab, btn) {
+  currentCodeTab = tab;
+  document.querySelectorAll(".code-tab-btn").forEach(b => b.classList.remove("active"));
+  if (btn) {
+    btn.classList.add("active");
+  } else {
+    const defaultBtn = document.querySelector(`.code-tab-btn[onclick*="'${tab}'"]`);
+    if (defaultBtn) defaultBtn.classList.add("active");
+  }
+  const snippets = generateCodeSnippets();
+  $("codeDisplayArea").textContent = snippets[tab];
+}
+
+/* ==================================================================
+   12. RUN HISTORY & TELEMETRY LIST
+   ================================================================== */
+function addRunHistoryItem(run) {
+  recentRuns.unshift(run);
+  if (recentRuns.length > 8) recentRuns.pop();
+
+  const container = $("runHistoryList");
+  container.innerHTML = "";
+
+  recentRuns.forEach(r => {
+    const item = document.createElement("div");
+    item.style.cssText = "display:flex; align-items:center; justify-content:space-between; padding:4px 8px; background:var(--bg-input); border-radius:4px;";
+    item.innerHTML = `
+      <div>
+        <span style="font-weight:600; color:var(--text-strong);">${r.model}</span>
+        <span style="color:var(--text-muted); font-size:10px;">· ${r.tokens} toks</span>
+      </div>
+      <div style="font-family:var(--mono-font); font-size:10.5px; color:var(--emerald);">
+        ${r.tps} tps · ${r.time}s
+      </div>
+    `;
+    container.append(item);
+  });
+}
+
+/* ==================================================================
+   13. UI EVENT LISTENERS & SHORTCUTS
+   ================================================================== */
+function setupEventListeners() {
+  // Provider selector
+  $("providerSelect").addEventListener("change", e => {
+    currentProvider = e.target.value;
+    localStorage.setItem("llm_playground_provider", currentProvider);
+    updateProviderUI();
+    loadModelsForProvider();
+  });
+
+  // Custom base URL input
+  $("customBaseUrl").addEventListener("input", e => {
+    localStorage.setItem("custom_base_url", e.target.value.trim());
+  });
+
+  // API Key input
+  $("apiKeyInput").addEventListener("input", saveKey);
+  $("apiKeyInput").addEventListener("blur", () => {
+    if (getKey()) loadModelsForProvider();
+  });
+  $("clearKeyBtn").addEventListener("click", () => {
+    $("apiKeyInput").value = "";
+    saveKey();
+  });
+  $("toggleKeyVisBtn").addEventListener("click", () => {
+    const input = $("apiKeyInput");
+    input.type = input.type === "password" ? "text" : "password";
+  });
+
+  // Model selector
+  $("modelSelect").addEventListener("change", handleModelChange);
+
+  // Synchronized sliders
+  linkSlider("tempRange", "tempBox", "tempValueLabel");
+  linkSlider("topPRange", "topPBox", "topPValueLabel");
+  linkSlider("maxTokensRange", "maxTokensBox", "maxTokensLabel");
+  linkSlider("freqPenRange", "freqPenBox");
+  linkSlider("presPenRange", "presPenBox");
+
+  // System preset selector
+  $("systemPresetSelect").addEventListener("change", e => {
+    const preset = SYSTEM_PRESETS[e.target.value];
+    if (preset) $("systemPromptInput").value = preset;
+    updateContextStats();
+  });
+  $("systemPromptInput").addEventListener("input", updateContextStats);
+
+  // Prompt input analysis & typing counter
+  $("promptInput").addEventListener("input", () => {
+    updateCharCount();
+    analyzeCurrentPrompt();
+  });
+
+  // Clear prompt
+  $("clearPromptTextBtn").addEventListener("click", () => {
+    $("promptInput").value = "";
+    updateCharCount();
+    analyzeCurrentPrompt();
+    $("promptInput").focus();
+  });
+
+  // Submit / Stop button
+  $("sendBtn").addEventListener("click", () => {
+    if (isStreaming) {
+      if (abortController) abortController.abort();
+    } else {
+      submitPrompt();
+    }
+  });
+
+  // Keyboard Shortcuts: Cmd/Ctrl + Enter to send, Esc to abort
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if (!isStreaming) submitPrompt();
+    }
+    if (e.key === "Escape") {
+      if (isStreaming && abortController) abortController.abort();
+      const codeDialog = $("codeDialog");
+      if (codeDialog.open) codeDialog.close();
+      const libDialog = $("libraryDialog");
+      if (libDialog.open) libDialog.close();
+    }
+  });
+
+  // Clear conversation reset
+  $("resetChatBtn").addEventListener("click", () => {
+    if (isStreaming && abortController) abortController.abort();
+    conversation = [];
+    $("transcript").innerHTML = "";
+    $("emptyState").hidden = false;
+    $("transcript").append($("emptyState"));
+    updateContextStats();
+  });
+
+  $("clearTranscriptOnlyBtn").addEventListener("click", () => {
+    $("transcript").innerHTML = "";
+    $("emptyState").hidden = false;
+    $("transcript").append($("emptyState"));
+  });
+
+  // View Code dialog
+  $("viewCodeBtn").addEventListener("click", () => {
+    const snippets = generateCodeSnippets();
+    $("codeDisplayArea").textContent = snippets[currentCodeTab];
+    $("codeDialog").showModal();
+  });
+
+  $("copyCodeBtn").addEventListener("click", () => {
+    navigator.clipboard.writeText($("codeDisplayArea").textContent);
+    $("copyCodeBtn").textContent = "✓ Copied!";
+    setTimeout(() => { $("copyCodeBtn").textContent = "📋 Copy Code"; }, 1500);
+  });
+
+  // Templates dialog
+  $("libraryBtn").addEventListener("click", () => {
+    $("libraryDialog").showModal();
+  });
+
+  // Export / Import
+  $("exportChatBtn").addEventListener("click", () => {
+    const data = {
+      provider: currentProvider,
+      model: $("modelSelect").value,
+      systemPrompt: $("systemPromptInput").value,
+      parameters: {
+        temperature: parseFloat($("tempRange").value),
+        max_tokens: parseInt($("maxTokensRange").value, 10),
+      },
+      conversation
+    };
+    $("ioTextArea").value = JSON.stringify(data, null, 2);
+    $("ioDialogTitle").textContent = "Exported Session JSON";
+    $("ioCopyOrLoadBtn").textContent = "Copy JSON";
+    $("ioCopyOrLoadBtn").onclick = () => {
+      navigator.clipboard.writeText($("ioTextArea").value);
+      $("ioCopyOrLoadBtn").textContent = "Copied!";
+      setTimeout(() => { $("ioDialog").close(); }, 800);
+    };
+    $("ioDialog").showModal();
+  });
+
+  $("importChatBtn").addEventListener("click", () => {
+    $("ioTextArea").value = "";
+    $("ioDialogTitle").textContent = "Import Session JSON";
+    $("ioCopyOrLoadBtn").textContent = "Load Conversation";
+    $("ioCopyOrLoadBtn").onclick = () => {
+      try {
+        const parsed = JSON.parse($("ioTextArea").value);
+        if (Array.isArray(parsed.conversation)) {
+          conversation = parsed.conversation;
+          $("transcript").innerHTML = "";
+          conversation.forEach(m => {
+            if (m.role === "user") appendUserMessage(m.content);
+            else if (m.role === "assistant") {
+              const view = createAssistantBubble();
+              view.answerBody.innerHTML = renderMarkdown(m.content);
+            }
+          });
+          updateContextStats();
+          $("ioDialog").close();
+        }
+      } catch (e) {
+        alert("Invalid JSON format. Please paste valid session JSON.");
+      }
+    };
+    $("ioDialog").showModal();
+  });
+
+  // Arena Mode Toggle
+  $("arenaToggleBtn").addEventListener("click", () => {
+    isArenaMode = !isArenaMode;
+    $("arenaToggleBtn").classList.toggle("active", isArenaMode);
+    $("transcript").hidden = isArenaMode;
+    $("arenaContainer").hidden = !isArenaMode;
+  });
+
+  // Layout sidebar toggles
+  $("toggleParamsBtn").addEventListener("click", () => {
+    $("mainWorkspace").classList.toggle("hide-params");
+  });
+  $("toggleInsightsBtn").addEventListener("click", () => {
+    $("mainWorkspace").classList.toggle("hide-insights");
+  });
+}
+
+function linkSlider(rangeId, boxId, labelId) {
+  const range = $(rangeId);
+  const box = $(boxId);
+  if (!range || !box) return;
+
+  range.addEventListener("input", () => {
+    box.value = range.value;
+    if (labelId && $(labelId)) $(labelId).textContent = range.value;
+  });
+  box.addEventListener("input", () => {
+    range.value = box.value;
+    if (labelId && $(labelId)) $(labelId).textContent = box.value;
+  });
+}
+
+function setMaxTokens(n) {
+  $("maxTokensRange").value = n;
+  $("maxTokensBox").value = n;
+  $("maxTokensLabel").textContent = n;
+}
+
+function loadTemplate(key) {
+  if (PROMPT_TEMPLATES[key]) {
+    $("promptInput").value = PROMPT_TEMPLATES[key];
+    updateCharCount();
+    analyzeCurrentPrompt();
+    $("emptyState").hidden = true;
+    $("promptInput").focus();
+  }
+}
+
+// Kick off app
+window.addEventListener("DOMContentLoaded", initApp);
+</script>
+</body>
+</html>
